@@ -23,28 +23,37 @@
 */
 queue_t *q_new()
 {
-  if(malloc(sizeof(queue_t)) == NULL){
-      return NULL;
-  }
-  queue_t *q =  malloc(sizeof(queue_t));
-  /* What if malloc returned NULL? */
-  q->head = NULL;
-  q->tail = NULL;
-  q->size = 0;
-  return q;
+    queue_t *q =  malloc(sizeof(queue_t));
+    if(q == NULL){
+        return NULL;
+    }
+    /* What if malloc returned NULL? */
+    q->head = NULL;
+    q->tail = NULL;
+    q->size = 0;
+    return q;
 }
 
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
+    if(q == NULL){
+      return;
+    }
     /* How about freeing the list elements and the strings? */
-    list_ele_t *curr = q->head;
-    while(curr != NULL){
-      list_ele_t * fNode = curr;
-      char * fString = curr->value;
-      free(fString);
-      free(fNode);
-      curr = curr->next;
+    list_ele_t *curr;
+    while(q->head != NULL){
+      curr = q->head;
+      q->head = NULL;
+      q->head = q->head->next;
+      if(curr->value == NULL){
+        break;
+      }
+      free(curr->value);
+      if(curr == NULL){
+        break;
+      }
+      free(curr);
     }
     /* Free queue structure */
     free(q);
@@ -64,16 +73,16 @@ bool q_insert_head(queue_t *q, char *s)
     if(q == NULL){
       return false;
     }
-    if(malloc(sizeof(list_ele_t)) == NULL){
+    newh = malloc(sizeof(list_ele_t));
+    if(newh == NULL){
       return false;
     }
-    newh = malloc(sizeof(list_ele_t));
     /* Don't forget to allocate space for the string and copy it */
     /* What if either call to malloc returns NULL? */
-    if(malloc(sizeof(s)) == NULL){
+    char * news = malloc(sizeof(s));
+    if(news == NULL){
       return false;
     }
-    char * news = malloc(sizeof(s));
     strcpy(news, s);
     newh->value = news;
     newh->next = q->head;
@@ -101,14 +110,14 @@ bool q_insert_tail(queue_t *q, char *s)
     if(q == NULL){
       return false;
     }
-    if(malloc(sizeof(list_ele_t)) == NULL){
-      return false;
-    }
     newt =  malloc(sizeof(list_ele_t));
-    if(malloc(sizeof(s)) == NULL){
+    if(newt == NULL){
       return false;
     }
     char * news = malloc(sizeof(s));
+    if(news == NULL){
+      return false;
+    }
     strcpy(news ,s);
     newt->value = news;
     newt->next = NULL;
@@ -134,16 +143,19 @@ bool q_insert_tail(queue_t *q, char *s)
 */
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
+    list_ele_t * temp;
     /* You need to fix up this code. */
     if(q == NULL || q->head == NULL){
       return false;
     }
-    if(sp != NULL){
-      sp = q->head->value;
+    if(sp == NULL){
+      return false;
     }
-    list_ele_t * oldhead = q->head;
+    temp = q->head;
+    strcpy(sp, temp->value);
     q->head = q->head->next;
-    free(oldhead);
+    free(temp->value);
+    free(temp);
     q->size--;
     return true;
 }
@@ -169,5 +181,12 @@ int q_size(queue_t *q)
 void q_reverse(queue_t *q)
 {
     /* You need to write the code for this function */
+    if(q == NULL || q->head == NULL){
+      return;
+    }
+    if(q->head == q->tail){
+      return;
+    }
+    
 }
 
