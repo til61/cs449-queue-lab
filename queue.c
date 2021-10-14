@@ -44,7 +44,6 @@ void q_free(queue_t *q)
     list_ele_t *curr;
     while(q->head != NULL){
       curr = q->head;
-      q->head = NULL;
       q->head = q->head->next;
       if(curr->value == NULL){
         break;
